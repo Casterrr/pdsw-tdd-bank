@@ -48,23 +48,6 @@ class Conta {
   validarCPF(cpf) {
     if (!cpf) return false;
     
-    // CPFs válidos específicos para testes (mantidos para compatibilidade com os testes)
-    const cpfsValidos = [
-      '975.711.270-41',
-      '529.982.247-25',
-      '52998224725',
-      '97571127041',
-      '157.277.570-02',
-      '15727757002',
-      '361.048.660-00',
-      '36104866000'
-    ];
-    
-    // Se for um CPF específico para teste, aceita
-    if (cpfsValidos.includes(cpf)) {
-      return true;
-    }
-    
     // Algoritmo real de validação de CPF
     // Remove caracteres não numéricos
     const cpfLimpo = cpf.toString().replace(/\D/g, '');
