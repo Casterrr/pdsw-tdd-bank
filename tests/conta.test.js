@@ -123,7 +123,7 @@ describe('Modelo de Conta', () => {
   });
   
   test('deve transferir um valor para outra conta', () => {
-    const contaDestino = new Conta('Destino', '048.454.787-06', 500, 500);
+    const contaDestino = new Conta('Destino', '975.711.270-41', 500, 500);
     const saldoOrigem = conta.saldo;
     const saldoDestino = contaDestino.saldo;
     const valor = 300;
@@ -158,7 +158,8 @@ describe('Modelo de Conta', () => {
 });
 
 describe('Serviço de Conta', () => {
-  const cpfValido = '529.982.247-25';
+  const cpfValido1 = '157.277.570-02';
+  const cpfValido2 = '361.048.660-00';
   
   beforeEach(() => {
     // Limpar os mocks antes de cada teste
@@ -166,20 +167,20 @@ describe('Serviço de Conta', () => {
   });
   
   test('deve criar uma conta com parâmetros válidos', () => {
-    const contaMock = new Conta('Teste', cpfValido, 1000, 500);
+    const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
     mockDB.criarConta.mockReturnValue(contaMock);
     mockDB.encontrarContaPorCPF.mockReturnValue(null); // Simula CPF não existente
     
-    const conta = contaService.criarConta('Teste', cpfValido, 1000, 500);
+    const conta = contaService.criarConta('Teste', cpfValido1, 1000, 500);
     
-    expect(mockDB.encontrarContaPorCPF).toHaveBeenCalledWith(cpfValido);
-    expect(mockDB.criarConta).toHaveBeenCalledWith('Teste', cpfValido, 1000, 500);
+    expect(mockDB.encontrarContaPorCPF).toHaveBeenCalledWith(cpfValido1);
+    expect(mockDB.criarConta).toHaveBeenCalledWith('Teste', cpfValido1, 1000, 500);
     expect(conta).toEqual(contaMock);
   });
   
   test('não deve criar conta sem titular', () => {
-    expect(() => contaService.criarConta('', cpfValido, 1000, 500)).toThrow('O titular da conta é obrigatório');
-    expect(() => contaService.criarConta(null, cpfValido, 1000, 500)).toThrow('O titular da conta é obrigatório');
+    expect(() => contaService.criarConta('', cpfValido1, 1000, 500)).toThrow('O titular da conta é obrigatório');
+    expect(() => contaService.criarConta(null, cpfValido1, 1000, 500)).toThrow('O titular da conta é obrigatório');
   });
   
   test('não deve criar conta sem CPF', () => {
@@ -188,24 +189,24 @@ describe('Serviço de Conta', () => {
   });
   
   test('não deve criar conta com CPF já existente', () => {
-    const contaExistente = new Conta('Teste Existente', cpfValido, 1000, 500);
+    const contaExistente = new Conta('Teste Existente', cpfValido1, 1000, 500);
     mockDB.encontrarContaPorCPF.mockReturnValue(contaExistente);
     
-    expect(() => contaService.criarConta('Teste', cpfValido, 1000, 500)).toThrow('Já existe uma conta com este CPF');
+    expect(() => contaService.criarConta('Teste', cpfValido1, 1000, 500)).toThrow('Já existe uma conta com este CPF');
   });
   
   test('não deve criar conta com saldo inicial negativo', () => {
     mockDB.encontrarContaPorCPF.mockReturnValue(null);
-    expect(() => contaService.criarConta('Teste', cpfValido, -100, 500)).toThrow('Saldo inicial não pode ser negativo');
+    expect(() => contaService.criarConta('Teste', cpfValido1, -100, 500)).toThrow('Saldo inicial não pode ser negativo');
   });
   
   test('não deve criar conta com limite negativo', () => {
     mockDB.encontrarContaPorCPF.mockReturnValue(null);
-    expect(() => contaService.criarConta('Teste', cpfValido, 1000, -500)).toThrow('Limite não pode ser negativo');
+    expect(() => contaService.criarConta('Teste', cpfValido1, 1000, -500)).toThrow('Limite não pode ser negativo');
   });
   
   test('deve buscar uma conta pelo ID', () => {
-    const contaMock = new Conta('Teste', cpfValido, 1000, 500);
+    const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
     mockDB.encontrarConta.mockReturnValue(contaMock);
     
     const conta = contaService.buscarConta('abc123-teste-uuid');
@@ -221,12 +222,12 @@ describe('Serviço de Conta', () => {
   });
   
   test('deve buscar uma conta pelo CPF', () => {
-    const contaMock = new Conta('Teste', cpfValido, 1000, 500);
+    const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
     mockDB.encontrarContaPorCPF.mockReturnValue(contaMock);
     
-    const conta = contaService.buscarContaPorCPF(cpfValido);
+    const conta = contaService.buscarContaPorCPF(cpfValido1);
     
-    expect(mockDB.encontrarContaPorCPF).toHaveBeenCalledWith(cpfValido);
+    expect(mockDB.encontrarContaPorCPF).toHaveBeenCalledWith(cpfValido1);
     expect(conta).toEqual(contaMock);
   });
   
@@ -238,8 +239,8 @@ describe('Serviço de Conta', () => {
   
   test('deve listar todas as contas', () => {
     const contasMock = [
-      new Conta('Teste 1', '529.982.247-25', 1000, 500),
-      new Conta('Teste 2', '048.454.787-06', 2000, 1000)
+      new Conta('Teste 1', cpfValido1, 1000, 500),
+      new Conta('Teste 2', cpfValido2, 2000, 1000)
     ];
     mockDB.listarContas.mockReturnValue(contasMock);
     
@@ -250,7 +251,7 @@ describe('Serviço de Conta', () => {
   });
   
   test('deve realizar depósito em uma conta', () => {
-    const contaMock = new Conta('Teste', cpfValido, 1000, 500);
+    const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
     const depositarSpy = jest.spyOn(contaMock, 'depositar');
     
     mockDB.encontrarConta.mockReturnValue(contaMock);
@@ -264,7 +265,7 @@ describe('Serviço de Conta', () => {
   });
   
   test('deve realizar saque em uma conta', () => {
-    const contaMock = new Conta('Teste', cpfValido, 1000, 500);
+    const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
     const sacarSpy = jest.spyOn(contaMock, 'sacar');
     
     mockDB.encontrarConta.mockReturnValue(contaMock);
@@ -278,8 +279,8 @@ describe('Serviço de Conta', () => {
   });
   
   test('deve realizar transferência entre contas', () => {
-    const contaOrigem = new Conta('Origem', '529.982.247-25', 1000, 500);
-    const contaDestino = new Conta('Destino', '048.454.787-06', 500, 500);
+    const contaOrigem = new Conta('Origem', cpfValido1, 1000, 500);
+    const contaDestino = new Conta('Destino', cpfValido2, 500, 500);
     const transferirSpy = jest.spyOn(contaOrigem, 'transferir');
     
     mockDB.encontrarConta.mockImplementation((id) => {
@@ -299,4 +300,4 @@ describe('Serviço de Conta', () => {
   });
 });
 
-// Na versão 3, adicionar testes de integração e da API com supertest
+// Você poderá adicionar testes de integração e da API com supertest em uma versão futura
