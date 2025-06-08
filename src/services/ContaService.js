@@ -8,9 +8,19 @@ class ContaService {
   /**
    * Cria uma nova conta bancária
    */
-  criarConta(titular, saldoInicial, limite) {
+  criarConta(titular, cpf, saldoInicial, limite) {
     if (!titular || titular.trim() === '') {
       throw new Error('O titular da conta é obrigatório');
+    }
+    
+    if (!cpf) {
+      throw new Error('O CPF é obrigatório');
+    }
+    
+    // Verifica se já existe uma conta com o mesmo CPF
+    const contaExistente = mockDB.encontrarContaPorCPF(cpf);
+    if (contaExistente) {
+      throw new Error('Já existe uma conta com este CPF');
     }
     
     if (saldoInicial < 0) {
@@ -21,7 +31,7 @@ class ContaService {
       throw new Error('Limite não pode ser negativo');
     }
     
-    return mockDB.criarConta(titular, saldoInicial, limite);
+    return mockDB.criarConta(titular, cpf, saldoInicial, limite);
   }
 
   /**
@@ -32,7 +42,23 @@ class ContaService {
       throw new Error('ID da conta é obrigatório');
     }
     
-    const conta = mockDB.encontrarConta(Number(id));
+    const conta = mockDB.encontrarConta(id);
+    if (!conta) {
+      throw new Error('Conta não encontrada');
+    }
+    
+    return conta;
+  }
+
+  /**
+   * Busca uma conta pelo CPF
+   */
+  buscarContaPorCPF(cpf) {
+    if (!cpf) {
+      throw new Error('CPF é obrigatório');
+    }
+    
+    const conta = mockDB.encontrarContaPorCPF(cpf);
     if (!conta) {
       throw new Error('Conta não encontrada');
     }

@@ -10,8 +10,13 @@ class ContaController {
    */
   criarConta(req, res) {
     try {
-      const { titular, saldoInicial, limite } = req.body;
-      const novaConta = contaService.criarConta(titular, saldoInicial, limite);
+      const { titular, cpf, saldoInicial, limite } = req.body;
+      
+      if (!cpf) {
+        return res.status(400).json({ error: 'CPF é obrigatório' });
+      }
+      
+      const novaConta = contaService.criarConta(titular, cpf, saldoInicial, limite);
       return res.status(201).json(novaConta);
     } catch (error) {
       return res.status(400).json({ error: error.message });
@@ -25,6 +30,19 @@ class ContaController {
     try {
       const { id } = req.params;
       const conta = contaService.buscarConta(id);
+      return res.status(200).json(conta);
+    } catch (error) {
+      return res.status(404).json({ error: error.message });
+    }
+  }
+
+  /**
+   * Busca uma conta pelo CPF
+   */
+  buscarContaPorCPF(req, res) {
+    try {
+      const { cpf } = req.params;
+      const conta = contaService.buscarContaPorCPF(cpf);
       return res.status(200).json(conta);
     } catch (error) {
       return res.status(404).json({ error: error.message });

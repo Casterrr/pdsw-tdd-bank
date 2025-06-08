@@ -7,28 +7,33 @@ import Conta from '../models/Conta.js';
 class MockDB {
   constructor() {
     this.contas = [];
-    this.contadorId = 1;
-
+    
     // Adicionar algumas contas de exemplo
     this.adicionarContasIniciais();
   }
 
   adicionarContasIniciais() {
-    const conta1 = new Conta(this.contadorId++, 'João Silva', 1000, 500);
-    const conta2 = new Conta(this.contadorId++, 'Maria Souza', 2500, 1000);
-    const conta3 = new Conta(this.contadorId++, 'Pedro Santos', 100, 200);
+    const conta1 = new Conta('João Silva', '123.456.789-00', 1000, 500);
+    const conta2 = new Conta('Maria Souza', '987.654.321-00', 2500, 1000);
+    const conta3 = new Conta('Pedro Santos', '111.222.333-44', 100, 200);
     
     this.contas.push(conta1, conta2, conta3);
   }
 
-  criarConta(titular, saldoInicial = 0, limite = 1000) {
-    const novaConta = new Conta(this.contadorId++, titular, saldoInicial, limite);
+  criarConta(titular, cpf, saldoInicial = 0, limite = 1000) {
+    const novaConta = new Conta(titular, cpf, saldoInicial, limite);
     this.contas.push(novaConta);
     return novaConta;
   }
 
   encontrarConta(id) {
     return this.contas.find(conta => conta.id === id);
+  }
+
+  encontrarContaPorCPF(cpf) {
+    // Remove caracteres não numéricos para comparação
+    const cpfLimpo = cpf.toString().replace(/[^\d]/g, '');
+    return this.contas.find(conta => conta.cpf.toString().replace(/[^\d]/g, '') === cpfLimpo);
   }
 
   listarContas() {

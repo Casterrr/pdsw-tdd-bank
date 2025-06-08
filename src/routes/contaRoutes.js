@@ -10,8 +10,11 @@ const router = Router();
 // Listar todas as contas
 router.get('/contas', contaController.listarContas);
 
-// Buscar uma conta específica
+// Buscar uma conta específica pelo ID
 router.get('/contas/:id', contaController.buscarConta);
+
+// Buscar uma conta pelo CPF
+router.get('/contas/cpf/:cpf', contaController.buscarContaPorCPF);
 
 // Criar uma nova conta
 router.post('/contas', contaController.criarConta);
