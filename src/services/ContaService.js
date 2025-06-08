@@ -9,123 +9,72 @@ class ContaService {
    * Cria uma nova conta bancária
    */
   criarConta(titular, cpf, saldoInicial, limite) {
-    if (!titular || titular.trim() === '') {
-      throw new Error('O titular da conta é obrigatório');
-    }
-    
-    if (!cpf) {
-      throw new Error('O CPF é obrigatório');
-    }
-    
-    // Verifica se já existe uma conta com o mesmo CPF
-    const contaExistente = mockDB.encontrarContaPorCPF(cpf);
-    if (contaExistente) {
-      throw new Error('Já existe uma conta com este CPF');
-    }
-    
-    if (saldoInicial < 0) {
-      throw new Error('Saldo inicial não pode ser negativo');
-    }
-    
-    if (limite < 0) {
-      throw new Error('Limite não pode ser negativo');
-    }
-    
-    return mockDB.criarConta(titular, cpf, saldoInicial, limite);
+    // TODO: Implementar criação de conta
+    return null;
   }
 
   /**
    * Busca uma conta pelo ID
    */
   buscarConta(id) {
-    if (!id) {
-      throw new Error('ID da conta é obrigatório');
-    }
-    
-    const conta = mockDB.encontrarConta(id);
-    if (!conta) {
-      throw new Error('Conta não encontrada');
-    }
-    
-    return conta;
+    // TODO: Implementar busca de conta por ID
+    return null;
   }
 
   /**
    * Busca uma conta pelo CPF
    */
   buscarContaPorCPF(cpf) {
-    if (!cpf) {
-      throw new Error('CPF é obrigatório');
-    }
-    
-    const conta = mockDB.encontrarContaPorCPF(cpf);
-    if (!conta) {
-      throw new Error('Conta não encontrada');
-    }
-    
-    return conta;
+    // TODO: Implementar busca de conta por CPF
+    return null;
   }
 
   /**
    * Lista todas as contas
    */
   listarContas() {
-    return mockDB.listarContas();
+    // TODO: Implementar listagem de contas
+    return [];
   }
 
   /**
    * Realiza depósito em uma conta
    */
   depositar(id, valor) {
-    const conta = this.buscarConta(id);
-    conta.depositar(Number(valor));
-    mockDB.atualizarConta(conta);
-    return conta;
+    // TODO: Implementar depósito
+    return null;
   }
 
   /**
    * Realiza saque em uma conta
    */
   sacar(id, valor) {
-    const conta = this.buscarConta(id);
-    conta.sacar(Number(valor));
-    mockDB.atualizarConta(conta);
-    return conta;
+    // TODO: Implementar saque
+    return null;
   }
 
   /**
    * Realiza transferência entre contas
    */
   transferir(idOrigem, idDestino, valor) {
-    const contaOrigem = this.buscarConta(idOrigem);
-    const contaDestino = this.buscarConta(idDestino);
-    
-    contaOrigem.transferir(Number(valor), contaDestino);
-    
-    mockDB.atualizarConta(contaOrigem);
-    mockDB.atualizarConta(contaDestino);
-    
-    return { contaOrigem, contaDestino };
+    // TODO: Implementar transferência
+    return null;
   }
 
   /**
    * Inativa uma conta
    */
   inativarConta(id) {
-    const conta = this.buscarConta(id);
-    conta.inativar();
-    mockDB.atualizarConta(conta);
-    return conta;
+    // TODO: Implementar inativação de conta
+    return null;
   }
 
   /**
    * Reativa uma conta
    */
   reativarConta(id) {
-    const conta = this.buscarConta(id);
-    conta.reativar();
-    mockDB.atualizarConta(conta);
-    return conta;
+    // TODO: Implementar reativação de conta
+    return null;
   }
 }
 

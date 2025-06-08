@@ -7,57 +7,40 @@ import Conta from '../models/Conta.js';
 class MockDB {
   constructor() {
     this.contas = [];
-    
-    // Adicionar algumas contas de exemplo
-    this.adicionarContasIniciais();
   }
 
   adicionarContasIniciais() {
-    const conta1 = new Conta('João Silva', '123.456.789-00', 1000, 500);
-    const conta2 = new Conta('Maria Souza', '987.654.321-00', 2500, 1000);
-    const conta3 = new Conta('Pedro Santos', '111.222.333-44', 100, 200);
-    
-    this.contas.push(conta1, conta2, conta3);
+    // TODO: Implementar adição de contas iniciais
   }
 
   criarConta(titular, cpf, saldoInicial = 0, limite = 1000) {
-    const novaConta = new Conta(titular, cpf, saldoInicial, limite);
-    this.contas.push(novaConta);
-    return novaConta;
+    // TODO: Implementar criação de conta
+    return null;
   }
 
   encontrarConta(id) {
-    return this.contas.find(conta => conta.id === id);
+    // TODO: Implementar busca de conta por ID
+    return null;
   }
 
   encontrarContaPorCPF(cpf) {
-    // Remove caracteres não numéricos para comparação
-    const cpfLimpo = cpf.toString().replace(/[^\d]/g, '');
-    return this.contas.find(conta => conta.cpf.toString().replace(/[^\d]/g, '') === cpfLimpo);
+    // TODO: Implementar busca de conta por CPF
+    return null;
   }
 
   listarContas() {
-    return [...this.contas];
+    // TODO: Implementar listagem de contas
+    return [];
   }
 
   atualizarConta(conta) {
-    const index = this.contas.findIndex(c => c.id === conta.id);
-    if (index === -1) {
-      return false;
-    }
-    
-    this.contas[index] = conta;
-    return true;
+    // TODO: Implementar atualização de conta
+    return false;
   }
 
   removerConta(id) {
-    const index = this.contas.findIndex(c => c.id === id);
-    if (index === -1) {
-      return false;
-    }
-    
-    this.contas.splice(index, 1);
-    return true;
+    // TODO: Implementar remoção de conta
+    return false;
   }
 }
 
