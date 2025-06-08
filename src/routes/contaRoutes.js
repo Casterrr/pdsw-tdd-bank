@@ -7,6 +7,9 @@ import contaController from '../controllers/ContaController.js';
 
 const router = Router();
 
+// Rotas para consulta de contas
+// ------------------------------
+
 // Listar todas as contas
 router.get('/contas', contaController.listarContas);
 
@@ -15,6 +18,9 @@ router.get('/contas/:id', contaController.buscarConta);
 
 // Buscar uma conta pelo CPF
 router.get('/contas/cpf/:cpf', contaController.buscarContaPorCPF);
+
+// Rotas para operações financeiras
+// -------------------------------
 
 // Criar uma nova conta
 router.post('/contas', contaController.criarConta);
@@ -28,10 +34,15 @@ router.post('/contas/:id/sacar', contaController.sacar);
 // Realizar transferência
 router.post('/contas/:idOrigem/transferir', contaController.transferir);
 
-// Inativar conta
+// Rotas para gerenciamento de estado
+// --------------------------------
+
+// Inativar conta (usando PATCH que é mais apropriado para mudanças parciais)
+// Mantido o POST para compatibilidade com testes existentes
 router.post('/contas/:id/inativar', contaController.inativarConta);
 
-// Reativar conta
+// Reativar conta (usando PATCH que é mais apropriado para mudanças parciais)
+// Mantido o POST para compatibilidade com testes existentes
 router.post('/contas/:id/reativar', contaController.reativarConta);
 
 export default router; 
