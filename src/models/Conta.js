@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 
 class Conta {
   constructor(titular, cpf, saldo = 0, limite = 1000) {
-    this.id = 'abc123-teste-uuid'; // Valor fixo para atender ao mock nos testes
+    this.id = randomUUID(); // Valor fixo para atender ao mock nos testes
     this.titular = titular;
     
     if (!this.validarCPF(cpf)) {
@@ -87,17 +87,29 @@ class Conta {
       throw new Error('Conta de destino inválida');
     }
     
+    if (contaDestino.id === this.id) {
+      throw new Error('Não é possível transferir para a mesma conta');
+    }
+    
     this.sacar(valor);
     contaDestino.depositar(valor);
     return true;
   }
   
   inativar() {
+    if (!this.ativa) {
+      throw new Error('A conta já está inativa');
+    }
+    
     this.ativa = false;
     return this.ativa;
   }
   
   reativar() {
+    if (this.ativa) {
+      throw new Error('A conta já está ativa');
+    }
+    
     this.ativa = true;
     return this.ativa;
   }

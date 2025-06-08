@@ -97,6 +97,10 @@ class ContaService {
    * Realiza transferência entre contas
    */
   transferir(idOrigem, idDestino, valor) {
+    if (idOrigem === idDestino) {
+      throw new Error('Não é possível transferir para a mesma conta');
+    }
+    
     const contaOrigem = this.buscarConta(idOrigem);
     const contaDestino = this.buscarConta(idDestino);
     

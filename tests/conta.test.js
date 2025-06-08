@@ -6,10 +6,13 @@ import Conta from '../src/models/Conta.js';
 import contaService from '../src/services/ContaService.js';
 import mockDB from '../src/data/mockDB.js';
 
-// Mock do crypto.randomUUID para testes determinísticos
-jest.mock('crypto', () => ({
-  randomUUID: () => 'abc123-teste-uuid'
-}));
+// Mock do crypto.randomUUID para gerar IDs diferentes
+jest.mock('crypto', () => {
+  let counter = 0;
+  return {
+    randomUUID: () => `teste-uuid-${counter++}`
+  };
+});
 
 // Mock do banco de dados para os testes
 jest.mock('../src/data/mockDB.js', () => ({
@@ -42,17 +45,21 @@ describe('Modelo de Conta', () => {
   let cpfValido = '529.982.247-25'; // CPF válido para testes
   
   beforeEach(() => {
+    // Criar uma nova conta para cada teste
     conta = new Conta('Teste', cpfValido, 1000, 500);
   });
   
   test('deve criar uma conta corretamente', () => {
-    expect(conta.id).toBe('abc123-teste-uuid');
-    expect(conta.titular).toBe('Teste');
-    expect(conta.cpf).toBe(cpfValido);
-    expect(conta.saldo).toBe(1000);
-    expect(conta.limite).toBe(500);
-    expect(conta.ativa).toBe(true);
-    expect(conta.dataCriacao).toBeInstanceOf(Date);
+    const novaConta = new Conta('Teste', cpfValido, 1000, 500);
+    
+    expect(novaConta.id).toBeTruthy(); // Verifica se um ID foi gerado
+    expect(typeof novaConta.id).toBe('string'); // Verifica se o ID é uma string
+    expect(novaConta.titular).toBe('Teste');
+    expect(novaConta.cpf).toBe(cpfValido);
+    expect(novaConta.saldo).toBe(1000);
+    expect(novaConta.limite).toBe(500);
+    expect(novaConta.ativa).toBe(true);
+    expect(novaConta.dataCriacao).toBeInstanceOf(Date);
   });
   
   test('não deve criar conta com CPF inválido', () => {
@@ -138,20 +145,27 @@ describe('Modelo de Conta', () => {
   });
   
   test('deve transferir um valor para outra conta', () => {
+    const contaOrigem = conta; // Usa a conta criada no beforeEach
     const contaDestino = new Conta('Destino', '975.711.270-41', 500, 500);
-    const saldoOrigem = conta.saldo;
+    const saldoOrigem = contaOrigem.saldo;
     const saldoDestino = contaDestino.saldo;
     const valor = 300;
     
-    conta.transferir(valor, contaDestino);
+    // IDs são gerados aleatoriamente, então serão diferentes
+    contaOrigem.transferir(valor, contaDestino);
     
-    expect(conta.saldo).toBe(saldoOrigem - valor);
+    expect(contaOrigem.saldo).toBe(saldoOrigem - valor);
     expect(contaDestino.saldo).toBe(saldoDestino + valor);
   });
   
   test('não deve transferir para uma conta inválida', () => {
     expect(() => conta.transferir(100, null)).toThrow('Conta de destino inválida');
     expect(() => conta.transferir(100, {})).toThrow('Conta de destino inválida');
+  });
+  
+  test('não deve transferir para a mesma conta', () => {
+    // Transferir para a mesma instância deve falhar
+    expect(() => conta.transferir(100, conta)).toThrow('Não é possível transferir para a mesma conta');
   });
   
   test('deve inativar uma conta', () => {
@@ -169,6 +183,19 @@ describe('Modelo de Conta', () => {
     conta.reativar();
     
     expect(conta.ativa).toBe(true);
+  });
+  
+  test('não deve inativar uma conta já inativa', () => {
+    conta.inativar();
+    expect(conta.ativa).toBe(false);
+    
+    expect(() => conta.inativar()).toThrow('A conta já está inativa');
+  });
+  
+  test('não deve reativar uma conta já ativa', () => {
+    expect(conta.ativa).toBe(true);
+    
+    expect(() => conta.reativar()).toThrow('A conta já está ativa');
   });
 });
 
@@ -195,6 +222,12 @@ describe('Serviço de Conta', () => {
   beforeEach(() => {
     // Limpar os mocks antes de cada teste
     jest.clearAllMocks();
+    
+    // Configurar mockDB.encontrarConta para buscar por ID
+    mockDB.encontrarConta.mockImplementation((id) => {
+      // Na maioria dos testes, apenas retorna o que foi configurado no teste específico
+      return null;
+    });
   });
   
   test('deve criar uma conta com parâmetros válidos', () => {
@@ -238,11 +271,13 @@ describe('Serviço de Conta', () => {
   
   test('deve buscar uma conta pelo ID', () => {
     const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
+    const contaId = contaMock.id; // Armazena o ID gerado
+    
     mockDB.encontrarConta.mockReturnValue(contaMock);
     
-    const conta = contaService.buscarConta('abc123-teste-uuid');
+    const conta = contaService.buscarConta(contaId);
     
-    expect(mockDB.encontrarConta).toHaveBeenCalledWith('abc123-teste-uuid');
+    expect(mockDB.encontrarConta).toHaveBeenCalledWith(contaId);
     expect(conta).toEqual(contaMock);
   });
   
@@ -283,13 +318,14 @@ describe('Serviço de Conta', () => {
   
   test('deve realizar depósito em uma conta', () => {
     const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
+    const contaId = contaMock.id; // Armazena o ID gerado
     const depositarSpy = jest.spyOn(contaMock, 'depositar');
     
     mockDB.encontrarConta.mockReturnValue(contaMock);
     
-    const conta = contaService.depositar('abc123-teste-uuid', 500);
+    const conta = contaService.depositar(contaId, 500);
     
-    expect(mockDB.encontrarConta).toHaveBeenCalledWith('abc123-teste-uuid');
+    expect(mockDB.encontrarConta).toHaveBeenCalledWith(contaId);
     expect(depositarSpy).toHaveBeenCalledWith(500);
     expect(mockDB.atualizarConta).toHaveBeenCalledWith(contaMock);
     expect(conta).toEqual(contaMock);
@@ -297,13 +333,14 @@ describe('Serviço de Conta', () => {
   
   test('deve realizar saque em uma conta', () => {
     const contaMock = new Conta('Teste', cpfValido1, 1000, 500);
+    const contaId = contaMock.id; // Armazena o ID gerado
     const sacarSpy = jest.spyOn(contaMock, 'sacar');
     
     mockDB.encontrarConta.mockReturnValue(contaMock);
     
-    const conta = contaService.sacar('abc123-teste-uuid', 500);
+    const conta = contaService.sacar(contaId, 500);
     
-    expect(mockDB.encontrarConta).toHaveBeenCalledWith('abc123-teste-uuid');
+    expect(mockDB.encontrarConta).toHaveBeenCalledWith(contaId);
     expect(sacarSpy).toHaveBeenCalledWith(500);
     expect(mockDB.atualizarConta).toHaveBeenCalledWith(contaMock);
     expect(conta).toEqual(contaMock);
@@ -312,21 +349,37 @@ describe('Serviço de Conta', () => {
   test('deve realizar transferência entre contas', () => {
     const contaOrigem = new Conta('Origem', cpfValido1, 1000, 500);
     const contaDestino = new Conta('Destino', cpfValido2, 500, 500);
+    const idOrigem = contaOrigem.id;
+    const idDestino = contaDestino.id;
+    
     const transferirSpy = jest.spyOn(contaOrigem, 'transferir');
     
     mockDB.encontrarConta.mockImplementation((id) => {
-      if (id === 'id-origem') return contaOrigem;
-      if (id === 'id-destino') return contaDestino;
+      if (id === idOrigem) return contaOrigem;
+      if (id === idDestino) return contaDestino;
       return null;
     });
     
-    const resultado = contaService.transferir('id-origem', 'id-destino', 300);
+    const resultado = contaService.transferir(idOrigem, idDestino, 300);
     
-    expect(mockDB.encontrarConta).toHaveBeenCalledWith('id-origem');
-    expect(mockDB.encontrarConta).toHaveBeenCalledWith('id-destino');
+    expect(mockDB.encontrarConta).toHaveBeenCalledWith(idOrigem);
+    expect(mockDB.encontrarConta).toHaveBeenCalledWith(idDestino);
     expect(transferirSpy).toHaveBeenCalledWith(300, contaDestino);
     expect(mockDB.atualizarConta).toHaveBeenCalledWith(contaOrigem);
     expect(mockDB.atualizarConta).toHaveBeenCalledWith(contaDestino);
     expect(resultado).toEqual({ contaOrigem, contaDestino });
+  });
+  
+  test('não deve permitir transferência para a mesma conta no serviço', () => {
+    // Criar uma conta com ID gerado automaticamente
+    const contaOrigem = new Conta('Origem', cpfValido1, 1000, 500);
+    const idOrigem = contaOrigem.id;
+    
+    // Configurar o mock para retornar a mesma conta independente do ID
+    mockDB.encontrarConta.mockReturnValue(contaOrigem);
+    
+    // Tentativa de transferir para a mesma conta deve falhar
+    expect(() => contaService.transferir(idOrigem, idOrigem, 300))
+      .toThrow('Não é possível transferir para a mesma conta');
   });
 });
