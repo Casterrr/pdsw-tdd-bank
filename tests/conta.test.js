@@ -22,6 +22,21 @@ jest.mock('../src/data/mockDB.js', () => ({
   removerConta: jest.fn()
 }));
 
+
+/*
+Testar o modelo. O modelo encapsula lógica de negócio. Nesse caso:
+
+- Validação e formatação de CPF.
+
+- Controle de saldo e limite.
+
+- Regras de depósito, saque e transferência.
+
+- Estados da conta (ativa/inativa).
+
+Esses comportamentos são unidades isoladas, com entradas bem definidas e resultados previsíveis — o cenário ideal para testes unitários com TDD.
+*/
+
 describe('Modelo de Conta', () => {
   let conta;
   let cpfValido = '529.982.247-25'; // CPF válido para testes
@@ -157,6 +172,22 @@ describe('Modelo de Conta', () => {
   });
 });
 
+
+/*
+Testar o serviço também, pois o serviço coordena o uso do modelo com a camada de persistência (mockDB). Ele:
+
+- Contém validações de alto nível (ex: titular obrigatório).
+
+- Garante regras como "CPF único".
+
+- Organiza fluxo de dados (buscar, atualizar, salvar).
+
+- Lida com erros e retorna mensagens coerentes.
+
+Aqui entramos no nível de teste de integração de componentes internos: você verifica como o serviço interage com o modelo e com a persistência (mesmo que mockada).
+*/
+
+// Simula o que a aplicação realmente faria sob condições reais. Com mocks
 describe('Serviço de Conta', () => {
   const cpfValido1 = '157.277.570-02';
   const cpfValido2 = '361.048.660-00';
@@ -299,5 +330,3 @@ describe('Serviço de Conta', () => {
     expect(resultado).toEqual({ contaOrigem, contaDestino });
   });
 });
-
-// Você poderá adicionar testes de integração e da API com supertest em uma versão futura
