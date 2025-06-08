@@ -177,9 +177,7 @@ class ContaService {
     
     // Verificar se as contas são diferentes
     if (idOrigem === idDestino) {
-      console.warn('Transferência para a mesma conta detectada');
-      // Comentado para não quebrar os testes
-      // throw new Error('Não é possível transferir para a mesma conta');
+      throw new Error('Não é possível transferir para a mesma conta');
     }
     
     // Validar valor

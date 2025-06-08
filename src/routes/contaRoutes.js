@@ -38,11 +38,9 @@ router.post('/contas/:idOrigem/transferir', contaController.transferir);
 // --------------------------------
 
 // Inativar conta (usando PATCH que é mais apropriado para mudanças parciais)
-// Mantido o POST para compatibilidade com testes existentes
-router.post('/contas/:id/inativar', contaController.inativarConta);
+router.patch('/contas/:id/inativar', contaController.inativarConta);
 
 // Reativar conta (usando PATCH que é mais apropriado para mudanças parciais)
-// Mantido o POST para compatibilidade com testes existentes
-router.post('/contas/:id/reativar', contaController.reativarConta);
+router.patch('/contas/:id/reativar', contaController.reativarConta);
 
 export default router; 

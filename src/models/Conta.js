@@ -5,9 +5,8 @@ import { randomUUID } from 'crypto';
 
 class Conta {
   constructor(titular, cpf, saldo = 0, limite = 1000) {
-    // Usar o ID fixo para testes, mas comentar a alternativa mais realista
-    this.id = 'abc123-teste-uuid'; // Valor fixo para atender ao mock nos testes
-    // Em produção seria melhor usar: this.id = randomUUID();
+    // Sempre gerar um ID aleatório usando randomUUID
+    this.id = randomUUID();
     
     // Validar o titular
     if (!titular || typeof titular !== 'string' || titular.trim() === '') {
@@ -181,9 +180,7 @@ class Conta {
     
     // Verificar se as contas são diferentes
     if (this.id === contaDestino.id) {
-      // Comentado para não quebrar os testes existentes, mas avisamos via console
-      console.warn('Atenção: Transferência para a mesma conta detectada');
-      // Não lançamos erro para manter compatibilidade com os testes
+      throw new Error('Não é possível transferir para a mesma conta');
     }
     
     // Realizar o saque na conta de origem
@@ -196,10 +193,9 @@ class Conta {
   }
   
   inativar() {
-    // Verificar se a conta já está inativa, mas não lançar erro para compatibilidade com testes
+    // Verificar se a conta já está inativa
     if (!this.ativa) {
-      console.warn('A conta já está inativa');
-      return this.ativa; // Retorna false
+      throw new Error('A conta já está inativa');
     }
     
     this.ativa = false;
@@ -207,10 +203,9 @@ class Conta {
   }
   
   reativar() {
-    // Verificar se a conta já está ativa, mas não lançar erro para compatibilidade com testes
+    // Verificar se a conta já está ativa
     if (this.ativa) {
-      console.warn('A conta já está ativa');
-      return this.ativa; // Retorna true
+      throw new Error('A conta já está ativa');
     }
     
     this.ativa = true;
