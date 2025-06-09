@@ -189,6 +189,19 @@ describe('Modelo de Conta', () => {
     
     expect(() => conta.reativar()).toThrow('A conta já está ativa');
   });
+  
+  test('não deve permitir transferência além do saldo + limite', () => {
+    const contaOrigem = new Conta('Origem', '157.277.570-02', 100, 500);
+    const contaDestino = new Conta('Destino', '975.711.270-41', 500, 500);
+    
+    // Tenta transferir 601, que é maior que saldo (100) + limite (500)
+    expect(() => contaOrigem.transferir(601, contaDestino))
+      .toThrow('Saldo insuficiente');
+      
+    // Verifica que os saldos não foram alterados
+    expect(contaOrigem.saldo).toBe(100);
+    expect(contaDestino.saldo).toBe(500);
+  });
 });
 
 
