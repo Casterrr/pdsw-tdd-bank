@@ -45,47 +45,31 @@ class Conta {
    * @returns {boolean} - Verdadeiro se o CPF for válido, falso caso contrário
    */
   validarCPF(cpf) {
-    if (!cpf) return false;
+    if (typeof cpf !== 'string') return false;
+
+    // Remove pontuação
+    cpf = cpf.replace(/\D/g, '');
     
-    // Algoritmo real de validação de CPF
-    // Remove caracteres não numéricos
-    const cpfLimpo = cpf.toString().replace(/\D/g, '');
-    
-    // Verifica se tem 11 dígitos
-    if (cpfLimpo.length !== 11) return false;
-    
-    // Verifica se todos os dígitos são iguais, o que invalida o CPF
-    if (/^(\d)\1{10}$/.test(cpfLimpo)) return false;
-    
-    // Cálculo do primeiro dígito verificador
-    let soma = 0;
-    for (let i = 0; i < 9; i++) {
-      soma += parseInt(cpfLimpo.charAt(i)) * (10 - i);
-    }
-    
-    let resto = soma % 11;
-    let digitoVerificador1 = resto < 2 ? 0 : 11 - resto;
-    
-    // Verifica o primeiro dígito verificador
-    if (digitoVerificador1 !== parseInt(cpfLimpo.charAt(9))) {
+    // Verifica se tem 11 dígitos e se todos são iguais
+    if (cpf.length !== 11 || cpf.split('').every(d => d === cpf[0])) {
       return false;
     }
-    
-    // Cálculo do segundo dígito verificador
-    soma = 0;
-    for (let i = 0; i < 10; i++) {
-      soma += parseInt(cpfLimpo.charAt(i)) * (11 - i);
-    }
-    
-    resto = soma % 11;
-    let digitoVerificador2 = resto < 2 ? 0 : 11 - resto;
-    
-    // Verifica o segundo dígito verificador
-    if (digitoVerificador2 !== parseInt(cpfLimpo.charAt(10))) {
-      return false;
-    }
-    
-    return true;
+
+    // Cálculo dos dígitos verificadores
+    const calcDigito = (base, pesoInicial) => {
+      let soma = 0;
+      for (let i = 0; i < base.length; i++) {
+        soma += parseInt(base[i]) * (pesoInicial - i);
+      }
+      let resto = soma % 11;
+      return resto < 2 ? 0 : 11 - resto;
+    };
+
+    const base = cpf.substring(0, 9);
+    const digito1 = calcDigito(base, 10);
+    const digito2 = calcDigito(base + digito1, 11);
+
+    return cpf === base + digito1.toString() + digito2.toString();
   }
 
   depositar(valor) {
