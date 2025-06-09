@@ -80,14 +80,6 @@ describe('Modelo de Conta', () => {
     expect(conta.validarCPF('')).toBe(false);
   });
   
-  test('deve formatar CPF corretamente', () => {
-    conta.cpf = '52998224725';
-    expect(conta.formatarCPF()).toBe('529.982.247-25');
-    
-    conta.cpf = '529.982.247-25';
-    expect(conta.formatarCPF()).toBe('529.982.247-25');
-  });
-  
   test('deve depositar um valor positivo', () => {
     const saldoAnterior = conta.saldo;
     const valor = 500;

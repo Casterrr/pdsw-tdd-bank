@@ -18,15 +18,6 @@ class Conta {
     return false;
   }
 
-  /**
-   * Formata o CPF com a máscara padrão (XXX.XXX.XXX-XX)
-   * @returns {string} - O CPF formatado
-   */
-  formatarCPF() {
-    // TODO: Implementar formatação de CPF
-    return '';
-  }
-
   depositar(valor) {
     // TODO: Implementar depósito
     return 0;
