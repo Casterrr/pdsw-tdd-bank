@@ -27,29 +27,45 @@ class Conta {
   validarCPF(cpf) {
     if (!cpf) return false;
     
-    // CPFs válidos específicos para testes
-    const cpfsValidos = [
-      '975.711.270-41',
-      '529.982.247-25',
-      '52998224725',
-      '97571127041',
-      '157.277.570-02',
-      '15727757002',
-      '361.048.660-00',
-      '36104866000'
-    ];
+    // Algoritmo real de validação de CPF
+    // Remove caracteres não numéricos
+    const cpfLimpo = cpf.toString().replace(/\D/g, '');
     
-    // Se for um CPF específico para teste, aceita
-    return cpfsValidos.includes(cpf);
-  }
-
-  /**
-   * Formata o CPF com a máscara padrão (XXX.XXX.XXX-XX)
-   * @returns {string} - O CPF formatado
-   */
-  formatarCPF() {
-    const cpfLimpo = this.cpf.toString().replace(/[^\d]/g, '');
-    return cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    // Verifica se tem 11 dígitos
+    if (cpfLimpo.length !== 11) return false;
+    
+    // Verifica se todos os dígitos são iguais, o que invalida o CPF
+    if (/^(\d)\1{10}$/.test(cpfLimpo)) return false;
+    
+    // Cálculo do primeiro dígito verificador
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+      soma += parseInt(cpfLimpo.charAt(i)) * (10 - i);
+    }
+    
+    let resto = soma % 11;
+    let digitoVerificador1 = resto < 2 ? 0 : 11 - resto;
+    
+    // Verifica o primeiro dígito verificador
+    if (digitoVerificador1 !== parseInt(cpfLimpo.charAt(9))) {
+      return false;
+    }
+    
+    // Cálculo do segundo dígito verificador
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+      soma += parseInt(cpfLimpo.charAt(i)) * (11 - i);
+    }
+    
+    resto = soma % 11;
+    let digitoVerificador2 = resto < 2 ? 0 : 11 - resto;
+    
+    // Verifica o segundo dígito verificador
+    if (digitoVerificador2 !== parseInt(cpfLimpo.charAt(10))) {
+      return false;
+    }
+    
+    return true;
   }
 
   depositar(valor) {
