@@ -88,23 +88,6 @@ class Conta {
     return true;
   }
 
-  /**
-   * Formata o CPF com a máscara padrão (XXX.XXX.XXX-XX)
-   * @returns {string} - O CPF formatado
-   */
-  formatarCPF() {
-    // Garantir que estamos trabalhando com string e remover caracteres não numéricos
-    const cpfLimpo = this.cpf.toString().replace(/\D/g, '');
-    
-    // Se o CPF não tiver 11 dígitos, retorna o valor original
-    if (cpfLimpo.length !== 11) {
-      return this.cpf;
-    }
-    
-    // Aplicar a máscara de formatação
-    return cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  }
-
   depositar(valor) {
     // Garantir que o valor é um número
     const valorNumerico = Number(valor);
