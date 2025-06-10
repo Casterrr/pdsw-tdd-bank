@@ -73,28 +73,21 @@ class Conta {
   }
 
   depositar(valor) {
-    // Garantir que o valor é um número
-    const valorNumerico = Number(valor);
-    
-    // Verificar se é um número válido
-    if (isNaN(valorNumerico)) {
-      throw new Error('O valor do depósito deve ser um número');
-    }
-    
-    // Verificar se é positivo
-    if (valorNumerico <= 0) {
+    const valorPositivo = valor > 0;
+    const contaAtiva = this.ativa;
+  
+    if (!valorPositivo) {
       throw new Error('O valor do depósito deve ser positivo');
     }
-    
-    // Verificar se a conta está ativa
-    if (!this.ativa) {
+  
+    if (!contaAtiva) {
       throw new Error('Não é possível depositar em uma conta inativa');
     }
-
-    // Arredondar para 2 casas decimais para evitar problemas de ponto flutuante
-    this.saldo = Math.round((this.saldo + valorNumerico) * 100) / 100;
+  
+    this.saldo += valor;
     return this.saldo;
   }
+  
 
   sacar(valor) {
     // Garantir que o valor é um número
