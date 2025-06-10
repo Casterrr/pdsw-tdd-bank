@@ -95,9 +95,33 @@ describe('Modelo de Conta', () => {
     expect(() => conta.depositar(-100)).toThrow('O valor do depósito deve ser positivo');
   });
   
+  test('não deve permitir depósito de valor não numérico', () => {
+    expect(() => conta.depositar('abc')).toThrow('O valor do depósito deve ser um número');
+    expect(() => conta.depositar(null)).toThrow('O valor do depósito deve ser um número');
+    expect(() => conta.depositar(undefined)).toThrow('O valor do depósito deve ser um número');
+    expect(() => conta.depositar({})).toThrow('O valor do depósito deve ser um número');
+    expect(() => conta.depositar([])).toThrow('O valor do depósito deve ser um número');
+  });
+  
   test('não deve permitir depósito em conta inativa', () => {
     conta.inativar();
     expect(() => conta.depositar(100)).toThrow('Não é possível depositar em uma conta inativa');
+  });
+  
+  test('deve retornar valor com 2 casas decimais ao depositar', () => {
+    // Criar uma conta com saldo inicial de valor exato
+    const contaDecimal = new Conta('Teste Decimal', cpfValido, 100, 500);
+    
+    // Depositar um valor com mais de 2 casas decimais
+    const novoSaldo = contaDecimal.depositar(10.005);
+    
+    // Verificar se o saldo tem exatamente 2 casas decimais
+    expect(novoSaldo).toBe(110.01); // 100 + 10.005 = 110.005, arredondado para 110.01
+    expect(novoSaldo.toString()).toMatch(/^\d+\.\d{2}$/);
+    
+    // Verificar se não há problema com valores que resultariam em mais de 2 casas
+    const outroSaldo = contaDecimal.depositar(0.009);
+    expect(outroSaldo).toBe(110.02); // 110.01 + 0.009 = 110.019, arredondado para 110.02
   });
   
   test('deve sacar um valor dentro do limite disponível', () => {
@@ -131,9 +155,37 @@ describe('Modelo de Conta', () => {
     expect(() => conta.sacar(-100)).toThrow('O valor do saque deve ser positivo');
   });
   
+  test('não deve permitir saque de valor não numérico', () => {
+    expect(() => conta.sacar('abc')).toThrow('O valor do saque deve ser um número');
+    expect(() => conta.sacar(null)).toThrow('O valor do saque deve ser um número');
+    expect(() => conta.sacar(undefined)).toThrow('O valor do saque deve ser um número');
+    expect(() => conta.sacar({})).toThrow('O valor do saque deve ser um número');
+    expect(() => conta.sacar([])).toThrow('O valor do saque deve ser um número');
+  });
+  
   test('não deve permitir saque em conta inativa', () => {
     conta.inativar();
     expect(() => conta.sacar(100)).toThrow('Não é possível sacar de uma conta inativa');
+  });
+  
+  test('deve retornar valor com 2 casas decimais ao sacar', () => {
+    // Criar uma conta com saldo inicial de valor exato
+    const contaDecimal = new Conta('Teste Decimal', cpfValido, 100, 500);
+    
+    // Sacar um valor com mais de 2 casas decimais
+    const novoSaldo = contaDecimal.sacar(10.005);
+    
+    // Verificar se o saldo tem exatamente 2 casas decimais
+    expect(novoSaldo).toBe(90.00); // 100 - 10.005 = 89.995, arredondado para 90.00
+    
+    // Testar com outro valor para verificar o arredondamento
+    contaDecimal.depositar(10); // Saldo agora é 100.00
+    const outroSaldo = contaDecimal.sacar(0.009);
+    expect(outroSaldo).toBe(99.99); // 100 - 0.009 = 99.991, arredondado para 99.99
+    
+    // Verificar formato decimal
+    const saldoString = outroSaldo.toString();
+    expect(saldoString).toMatch(/^\d+\.\d{2}$/);
   });
   
   test('deve transferir um valor para outra conta', () => {
