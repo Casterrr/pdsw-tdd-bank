@@ -90,34 +90,26 @@ class Conta {
   
 
   sacar(valor) {
-    // Garantir que o valor é um número
-    const valorNumerico = Number(valor);
-    
-    // Verificar se é um número válido
-    if (isNaN(valorNumerico)) {
-      throw new Error('O valor do saque deve ser um número');
-    }
-    
-    // Verificar se é positivo
-    if (valorNumerico <= 0) {
+    const valorPositivo = valor > 0;
+    const contaAtiva = this.ativa;
+    const saldoDisponivel = this.saldo + this.limite;
+  
+    if (!valorPositivo) {
       throw new Error('O valor do saque deve ser positivo');
     }
-    
-    // Verificar se a conta está ativa
-    if (!this.ativa) {
+  
+    if (!contaAtiva) {
       throw new Error('Não é possível sacar de uma conta inativa');
     }
-    
-    // Verificar se há saldo suficiente (considerando o limite)
-    const saldoDisponivel = this.saldo + this.limite;
-    if (valorNumerico > saldoDisponivel) {
+  
+    if (valor > saldoDisponivel) {
       throw new Error('Saldo insuficiente');
     }
-    
-    // Arredondar para 2 casas decimais para evitar problemas de ponto flutuante
-    this.saldo = Math.round((this.saldo - valorNumerico) * 100) / 100;
+  
+    this.saldo -= valor;
     return this.saldo;
   }
+  
 
   transferir(valor, contaDestino) {
     // Validar a conta de destino
