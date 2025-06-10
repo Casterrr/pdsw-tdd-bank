@@ -19,25 +19,15 @@ class Conta {
     this.dataCriacao = new Date();
   }
 
-  /**
-   * Valida se um CPF é válido
-   * @param {string} cpf - O CPF a ser validado
-   * @returns {boolean} - Verdadeiro se o CPF for válido, falso caso contrário
-   */
   validarCPF(cpf) {
     if (!cpf) return false;
-    
-    // Algoritmo real de validação de CPF
-    // Remove caracteres não numéricos
+
     const cpfLimpo = cpf.toString().replace(/\D/g, '');
-    
-    // Verifica se tem 11 dígitos
+
     if (cpfLimpo.length !== 11) return false;
     
-    // Verifica se todos os dígitos são iguais, o que invalida o CPF
     if (/^(\d)\1{10}$/.test(cpfLimpo)) return false;
     
-    // Cálculo do primeiro dígito verificador
     let soma = 0;
     for (let i = 0; i < 9; i++) {
       soma += parseInt(cpfLimpo.charAt(i)) * (10 - i);
@@ -46,12 +36,10 @@ class Conta {
     let resto = soma % 11;
     let digitoVerificador1 = resto < 2 ? 0 : 11 - resto;
     
-    // Verifica o primeiro dígito verificador
     if (digitoVerificador1 !== parseInt(cpfLimpo.charAt(9))) {
       return false;
     }
     
-    // Cálculo do segundo dígito verificador
     soma = 0;
     for (let i = 0; i < 10; i++) {
       soma += parseInt(cpfLimpo.charAt(i)) * (11 - i);
@@ -60,7 +48,6 @@ class Conta {
     resto = soma % 11;
     let digitoVerificador2 = resto < 2 ? 0 : 11 - resto;
     
-    // Verifica o segundo dígito verificador
     if (digitoVerificador2 !== parseInt(cpfLimpo.charAt(10))) {
       return false;
     }
